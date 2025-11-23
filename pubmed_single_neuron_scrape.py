@@ -34,14 +34,6 @@ def main():
         "depth electrode",
     ]
 
-    patch_intracellular = [
-        "patch clamp",
-        "whole-cell patch clamp",
-        "cell-attached recording",
-        "juxtacellular recording",
-        "voltage clamp",
-    ]
-
     # 2) Optical - calcium and voltage imaging
     optical_calcium_voltage = [
         "calcium imaging",
@@ -85,7 +77,6 @@ def main():
     recording_terms = (
         ephys_single_neuron
         + ephys_hardware
-        + patch_intracellular
         + optical_calcium_voltage
         + optical_hardware
     )
