@@ -22,9 +22,31 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
+      - name: Cache paperscraper dumps
+        uses: actions/cache@v4
+        with:
+          path: server_dumps
+          key: paperscraper-dumps-v1
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
+
+      - name: Download biorxiv dump if missing
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from paperscraper.get_dumps import biorxiv
+
+          dump = Path("server_dumps") / "biorxiv_metadata.jsonl"
+          if dump.exists() and dump.stat().st_size > 0:
+              print(f"biorxiv dump already present ({dump.stat().st_size/1e6:.1f} MB)")
+          else:
+              dump.parent.mkdir(parents=True, exist_ok=True)
+              print("Downloading biorxiv dump (first run can take several minutes)...")
+              biorxiv()
+              print("biorxiv dump downloaded.")
+          PY
 
       - name: Run PubMed scraper
         run: |
