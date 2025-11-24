@@ -26,25 +26,26 @@ jobs:
         uses: actions/cache@v4
         with:
           path: server_dumps
-          key: paperscraper-dumps-v1
+          key: paperscraper-dumps-v2-2021on
 
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
 
-      - name: Download biorxiv dump if missing
+      - name: Download biorxiv dump (>=2021) if missing
         run: |
           python - <<'PY'
           from pathlib import Path
           from paperscraper.get_dumps import biorxiv
+          from datetime import date
 
-          dump = Path("server_dumps") / "biorxiv_metadata.jsonl"
+          dump = Path("server_dumps") / "biorxiv_since_2021.jsonl"
           if dump.exists() and dump.stat().st_size > 0:
               print(f"biorxiv dump already present ({dump.stat().st_size/1e6:.1f} MB)")
           else:
               dump.parent.mkdir(parents=True, exist_ok=True)
-              print("Downloading biorxiv dump (first run can take several minutes)...")
-              biorxiv()
+              print("Downloading biorxiv dump from 2021-01-01 ...")
+              biorxiv(start_date="2021-01-01", save_path=str(dump))
               print("biorxiv dump downloaded.")
           PY
 
