@@ -12,22 +12,41 @@ def main():
     today = date.today().isoformat()
     out_file = data_dir / f"pubmed_single_neuron_{today}.jsonl"
 
-    # Build a compact PubMed boolean query to avoid 414 URI errors.
-    query = (
-        '(Neuropixels OR "silicon probe" OR "single-unit recording" OR '
-        '"spike train" OR "extracellular recording" OR "calcium imaging" OR '
-        '"voltage imaging") AND (neuron OR neuronal) AND '
-        '("2021/01/01"[Date - Publication] : "3000"[Date - Publication])'
-    )
+    # Keep keyword lists short so the generated PubMed query stays under URL limits.
+    recording_terms = [
+        "single-unit recording",
+        "spike train",
+        "extracellular recording",
+        "multi-unit recording",
+        "Neuropixels",
+        "silicon probe",
+        "calcium imaging",
+        "voltage imaging",
+    ]
+
+    neuron_terms = [
+        "neuron",
+        "neuronal",
+    ]
+
+    large_scale = [
+        "population recording",
+        "simultaneous recording",
+        "high-density recording",
+    ]
+
+    # Outer list items are ANDed, inner list items are ORed by paperscraper.
+    query = [recording_terms, neuron_terms, large_scale]
 
     print("Running PubMed query via paperscraper...")
     print("This corresponds roughly to:")
-    print("  (recording) AND (neuron) AND (2021+ date) AND (large-scale-ish)")
+    print("  (recording) AND (neuron) AND (large-scale-ish) AND (2021+ date)")
     print(f"Saving results to: {out_file}")
 
     get_and_dump_pubmed_papers(
         query,
         output_filepath=str(out_file),
+        start_date="2021/01/01",
     )
 
     print("Done.")
